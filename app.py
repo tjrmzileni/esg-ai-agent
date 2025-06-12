@@ -77,3 +77,14 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+# History Section
+if st.session_state.upload_history:
+    st.subheader("📂 Upload History (This Session)")
+    for idx, item in enumerate(reversed(st.session_state.upload_history)):
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            st.markdown(f"- **{item['filename']}** uploaded at *{item['timestamp']}*")
+        with col2:
+            if st.button(f"📄 View {item['filename']}", key=f"view_{idx}"):
+                active_df = item['data']
+                st.experimental_rerun()
