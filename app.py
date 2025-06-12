@@ -14,19 +14,38 @@ Upload your company's ESG data (CSV), and the agent will visualize emissions, en
 """)
 
 # File Upload
-uploaded_file = st.file_uploader("📂 Upload your ESG CSV file", type=["csv"])
+import io
 
-# Load and handle data
+uploaded_file = st.file_uploader("📂 Upload your ESG data (.csv or .xlsx)", type=["csv", "xlsx"])
+
 if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file)
+    file_type = uploaded_file.name.split('.')[-1]
+
+    try:
+        if file_type == 'csv':
+            df = pd.read_csv(uploaded_file)
+        elif file_type == 'xlsx':
+            df = pd.read_excel(uploaded_file, engine='openpyxl')
+        else:
+            st.error("Unsupported file format.")
+            st.stop()
+    except Exception as e:
+        st.error(f"Failed to load file: {e}")
+        st.stop()
+
+    st.success(f"File uploaded successfully ({file_type.upper()}) ✅")
 else:
     st.info("No file uploaded. Using sample data.")
     sample_csv = """Emissions_tCO2,Energy_kWh,Waste_kg
 1200,15000,320
 980,12200,280
 1100,13800,300"""
-    from io import StringIO
-    df = pd.read_csv(StringIO(sample_csv))
+    df = pd.read_csv(io.StringIO(sample_csv))
+required_columns = ['Emissions_tCO2', 'Energy_kWh', 'Waste_kg']
+if not all(col in df.columns for col in required_columns):
+    st.error(f"Missing required columns. Make sure your file includes: {', '.join(required_columns)}")
+    st.stop()
+
 
 # ESG Metrics
 st.subheader("📊 Key ESG Metrics")
