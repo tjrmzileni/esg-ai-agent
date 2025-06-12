@@ -1,46 +1,43 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
-from transformers import pipeline
-
-st.set_page_config(page_title="ESG AI Agent", layout="wide")  # ✅ Must come FIRST after imports
-
-# Title and Description
-st.title("🌍 ESG AI Agent")
-st.markdown("""
-Welcome to the ESG AI Agent — your smart assistant for analyzing sustainability metrics.
-
-Upload your company's ESG data (CSV), and the agent will visualize emissions, energy use, and waste trends.
-""")
-
-# File Upload
+import json
 import io
 
-uploaded_file = st.file_uploader("📂 Upload your ESG data (.csv or .xlsx)", type=["csv", "xlsx"])
+st.set_page_config(page_title="ESG AI Agent", layout="wide")
 
-if uploaded_file is not None:
-    file_type = uploaded_file.name.split('.')[-1]
+st.title("🌍 ESG AI Agent")
+st.markdown("""
+Upload your ESG data as CSV, Excel, or JSON and get powerful AI-driven insights on emissions, energy, and waste.
+""")
+
+# File upload
+uploaded_file = st.file_uploader("📂 Upload ESG file", type=["csv", "xlsx", "xls", "json"])
+
+# Load data
+if uploaded_file:
+    file_type = uploaded_file.name.split(".")[-1]
 
     try:
-        if file_type == 'csv':
+        if file_type == "csv":
             df = pd.read_csv(uploaded_file)
-        elif file_type == 'xlsx':
-            df = pd.read_excel(uploaded_file, engine='openpyxl')
+        elif file_type in ["xlsx", "xls"]:
+            df = pd.read_excel(uploaded_file)
+        elif file_type == "json":
+            stringio = io.StringIO(uploaded_file.getvalue().decode("utf-8"))
+            data = json.load(stringio)
+            df = pd.DataFrame(data)
         else:
-            st.error("Unsupported file format.")
-            st.stop()
+            st.error("Unsupported file type.")
     except Exception as e:
-        st.error(f"Failed to load file: {e}")
+        st.error(f"Error loading file: {e}")
         st.stop()
-
-    st.success(f"File uploaded successfully ({file_type.upper()}) ✅")
 else:
     st.info("No file uploaded. Using sample data.")
     sample_csv = """Emissions_tCO2,Energy_kWh,Waste_kg
 1200,15000,320
 980,12200,280
 1100,13800,300"""
-    df = pd.read_csv(io.StringIO(sample_csv))
+    df = pd.read_csv(pd.compat.StringIO(sample_csv))
 required_columns = ['Emissions_tCO2', 'Energy_kWh', 'Waste_kg']
 if not all(col in df.columns for col in required_columns):
     st.error(f"Missing required columns. Make sure your file includes: {', '.join(required_columns)}")
