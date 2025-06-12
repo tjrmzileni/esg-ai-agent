@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import json
 import io
+from transformers import pipeline
+
 
 st.set_page_config(page_title="ESG AI Agent", layout="wide")
 
@@ -37,7 +39,9 @@ else:
 1200,15000,320
 980,12200,280
 1100,13800,300"""
-    df = pd.read_csv(pd.compat.StringIO(sample_csv))
+df = pd.read_csv(io.StringIO(sample_csv))
+
+
 required_columns = ['Emissions_tCO2', 'Energy_kWh', 'Waste_kg']
 if not all(col in df.columns for col in required_columns):
     st.error(f"Missing required columns. Make sure your file includes: {', '.join(required_columns)}")
