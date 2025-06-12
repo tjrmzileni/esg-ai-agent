@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from transformers import pipeline
 
-st.set_page_config(page_title="ESG Agent Dashboard", layout="centered")
+st.set_page_config(page_title="ESG Agent Dashboard", layout="wide")
 
 # Title and Description
 st.title("🌍 ESG Agent Dashboard")
