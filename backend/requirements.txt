@@ -1,3 +1,5 @@
+fastapi
+uvicorn
 pandas
 matplotlib
 streamlit
@@ -5,3 +7,6 @@ python-docx
 transformers
 torch
 reportlab
+fastapi
+uvicorn
+
